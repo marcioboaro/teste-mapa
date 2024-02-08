@@ -26,8 +26,8 @@ def save():
     with open('poligono.geojson', 'w') as f:
         f.write(json.dumps(geojson_data))  # Converte o dicionário para JSON
     db = SessionLocal()
-    car = get_car_by_polygon(geojson_data, db)
-    return jsonify({'status': car})
+    status, message = get_car_by_polygon(geojson_data, db)
+    return jsonify({'status': status, 'message': message})
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -53,13 +53,14 @@ def get_car_by_polygon(geojson, db):
         rows = result.fetchall()
         if rows:
             car = [row[0] for row in rows]
-            messagebox.showinfo("CAR", str(car))
-            return "CAR encontrado."
+            return "success", f"CAR encontrado: {car}"
         else:
-            messagebox.showinfo("CAR", "Nenhum CAR encontrado.")
-            return "Nenhum CAR encontrado."
+            return "not_found", "Nenhum CAR encontrado."
     except Exception as e:
         print(f'Erro ao obter CAR por poligono: {e}')
-        return "Erro ao obter CAR por poligono."
+        return "error", "Erro ao obter CAR por poligono."
+
+
+
 
 

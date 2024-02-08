@@ -1,6 +1,32 @@
 // Criar o objeto map usando Leaflet.js
 var map = L.map('mapid').setView([-23.550520, -46.633308], 12);
 
+// Camadas base que o usuário pode escolher
+var camadasBase = {
+  "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">Contributors</a>'
+  }),
+  "Satélite": L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3'],
+    attribution: 'Imagens de satélite fornecidas por © Google'
+  }),
+  "Terreno": L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0','mt1','mt2','mt3'],
+      attribution: 'Dados de terreno fornecidos por © Google',
+  })
+};
+
+
+
+// Adiciona as camadas base ao mapa
+L.control.layers(camadasBase).addTo(map);
+
+// Define uma camada base padrão
+map.addLayer(camadasBase["OpenStreetMap"]);
+
+
 // Adicionar a camada de base do OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Contributors</a>'
@@ -24,7 +50,15 @@ var drawControl = new L.Control.Draw({
         message: 'O polígono não pode se cruzar!'
       },
       shapeOptions: {
-        color: '#97009c'
+        color: '#97009c',
+        weight: 4,
+        opacity: 0.7,
+        fill: true,
+        fillColor: '#c0c0c0',
+        fillOpacity: 0.5,
+        dashArray: '5, 5',
+        lineCap: 'round',
+        lineJoin: 'round'
       }
     },
     polyline: false,
@@ -35,10 +69,10 @@ var drawControl = new L.Control.Draw({
 });
 
 map.addControl(drawControl);
+
+// Adicionar evento de edição
 console.log('Leaflet', L);
 console.log('Leaflet Draw', L.Control.Draw);
-
-
 
 // Função para enviar o GeoJSON para o servidor
 function saveGeoJSON(geojson) {
@@ -47,19 +81,16 @@ function saveGeoJSON(geojson) {
   xhr.open('POST', '/save', true);
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.onload = function() {
-    console.log('Resposta recebida do servidor:', xhr.responseText);
     if (xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
-      console.log('Resposta JSON parseada:', response);
       if (response.status === 'success') {
-        alert('Polígono salvo com sucesso!');
+        alert(response.message);
+      } else if (response.status === 'not_found') {
+        alert(response.message);
       } else {
-        var errorMessage = response.message || 'Erro desconhecido';
-        console.error('Erro ao salvar o polígono:', errorMessage);
-        alert('Erro ao salvar o polígono: ' + errorMessage);
+        alert('Ocorreu um erro ao processar o seu pedido.');
       }
     } else {
-      console.error('Erro ao enviar o GeoJSON:', xhr.statusText);
       alert('Erro ao enviar o GeoJSON: ' + xhr.statusText);
     }
   };
