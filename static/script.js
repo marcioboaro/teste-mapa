@@ -1,7 +1,5 @@
-// Criar o objeto map usando Leaflet.js
 var map = L.map('mapid').setView([-23.550520, -46.633308], 12);
 
-// Camadas base que o usuário pode escolher
 var camadasBase = {
   "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">Contributors</a>'
@@ -18,25 +16,17 @@ var camadasBase = {
   })
 };
 
-
-
-// Adiciona as camadas base ao mapa
 L.control.layers(camadasBase).addTo(map);
 
-// Define uma camada base padrão
 map.addLayer(camadasBase["OpenStreetMap"]);
 
-
-// Adicionar a camada de base do OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">Contributors</a>'
 }).addTo(map);
 
-// Variável para armazenar as entidades desenhadas
 var drawnItems = new L.FeatureGroup();
 map.addLayer(drawnItems);
 
-// Adicionar ferramentas de desenho
 var drawControl = new L.Control.Draw({
   edit: {
     featureGroup: drawnItems
@@ -70,11 +60,9 @@ var drawControl = new L.Control.Draw({
 
 map.addControl(drawControl);
 
-// Adicionar evento de edição
 console.log('Leaflet', L);
 console.log('Leaflet Draw', L.Control.Draw);
 
-// Função para enviar o GeoJSON para o servidor
 function saveGeoJSON(geojson) {
   console.log('Função saveGeoJSON chamada com geojson:', geojson);
   var xhr = new XMLHttpRequest();
@@ -100,23 +88,18 @@ function saveGeoJSON(geojson) {
   xhr.send(JSON.stringify(geojson));
 }
 
-
-// Evento disparado após a criação do polígono
 map.on('draw:created', function(event) {
   console.log('Evento draw:created disparado');
   console.log('Polígono criado:', event);
   var layer = event.layer;
   drawnItems.addLayer(layer); // Adicione a camada ao grupo de camadas desenháveis
 
-  // Obter as coordenadas do polígono
   var coords = layer.getLatLngs();
   console.log('Coordenadas do polígono:', coords);
 
-  // Converter o polígono em GeoJSON
   var geojson = layer.toGeoJSON();
   console.log('GeoJSON do polígono:', geojson);
 
-  // Chamar a função para salvar o GeoJSON
   saveGeoJSON(geojson);
 });
 

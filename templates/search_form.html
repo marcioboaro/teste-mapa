@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta CAR</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header, footer {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+        #map {
+            height: 300px; /* Ajuste a altura conforme necessário */
+            margin-top: 20px;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Consulta CAR</h1>
+    </header>
+    <main>
+        <div class="input-group">
+            <label for="cod_imovel">Código do Imóvel:</label>
+            <input type="text" id="cod_imovel" placeholder="Código do Imóvel">
+        </div>
+        <div class="input-group">
+            <label for="longitude">Longitude:</label>
+            <input type="text" id="longitude" placeholder="Longitude">
+        </div>
+        <div class="input-group">
+            <label for="latitude">Latitude:</label>
+            <input type="text" id="latitude" placeholder="Latitude">
+        </div>
+        <button onclick="search()">Buscar</button>
+        <div id="map"></div>
+    </main>
+    <footer>
+        <p>© 2024 Painel de Controle CAR</p>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([-23.55052, -46.633308], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        var marker;
+        
+        map.on('click', function(e) {
+            var coord = e.latlng;
+            var lat = coord.lat;
+            var lng = coord.lng;
+            
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            marker = new L.marker(coord).addTo(map);
+            document.getElementById('longitude').value = lng;
+            document.getElementById('latitude').value = lat;
+        });
+        
+        function search() {
+            var codImovel = document.getElementById('cod_imovel').value;
+            var longitude = document.getElementById('longitude').value;
+            var latitude = document.getElementById('latitude').value;
+
+            // Verificar se algum dos campos está vazio
+            if (!codImovel && (!longitude || !latitude)) {
+                alert('Por favor, insira o código do imóvel ou as coordenadas.');
+                return; // Parar a execução se os campos estiverem vazios
+            }
+
+            // Construir o objeto de dados para enviar
+            var data = {
+                'cod_imovel': codImovel,
+                'longitude': longitude,
+                'latitude': latitude
+            };
+
+            // Desabilitar o botão de busca para evitar múltiplas solicitações
+            document.querySelector('button').disabled = true;
+
+            // Fazer uma solicitação POST para o servidor
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Problema na comunicação com o servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                if (data.status === 'success') {
+                    console.log('Status: success');
+                    if (data.cars.length > 0) {
+                        document.getElementById('cod_imovel').value = data.cars.join(', ');
+                    } else {
+                        document.getElementById('cod_imovel').value = 'Nenhum resultado encontrado.';
+                    }
+                } else if (data.status === 'not_found') {
+                    console.log('Status: not_found');
+                    document.getElementById('cod_imovel').value = 'Nenhum resultado encontrado.';
+                } else {
+                    console.log('Status: outro');
+                    alert('Ocorreu um problema: ' + data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Erro: ' + error.message);
+            })
+            .finally(() => {
+                // Reabilitar o botão de busca após a solicitação ser completada
+                document.querySelector('button').disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
+
