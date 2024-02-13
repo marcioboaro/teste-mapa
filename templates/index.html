@@ -4,42 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa Interativo - Painel de Controle CAR</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
     <link rel="icon" href="/static/favicon.ico">
     <style>
         #mapid {
             height: 100vh;
-            width: 100vw;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Bem-vindo ao Painel de Controle CAR</h1>
-        <nav>
-            <ul>
-                <li><a href="/">Início</a></li>
-                <li><a href="/search_form">Consultar CAR</a></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="/">World Grow - Busca CAR</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search_form">Consultar CAR</a>
+                </li>
             </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="introducao">
-            <h2>Introdução</h2>
-            <p>Este é o seu ponto de partida para consultar informações sobre o Cadastro Ambiental Rural (CAR).</p>
-        </section>
-        <section id="consulta-poligono">
-            <h2>Consulta por Polígono</h2>
-            <div id="mapid"></div>
-        </section>
+        </div>
+    </nav>
+    <main role="main" class="container">
+        <div class="jumbotron mt-5 text-center" style="padding: 0.5rem 1rem;">
+            <p><i>Trace um poligono no mapa abaixo, ao concluir terá como retorno os codigos dos imoveis da area selecionada.</i></p>
+        </div>
+
+        <div class="form-group">
+            <label for="cods_imovel">Cadastro Ambiental Rural:</label>
+            <textarea class="form-control" id="cods_imovel" placeholder="Cadastro Ambiental Rural" readonly></textarea>
+        </div>
+
+        <div id="mapid"></div>
     </main>
-    <footer>
-        <p>© 2024 Painel de Controle CAR</p>
+    <footer class="footer mt-auto py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2024 World Grow - Busca CAR</span>
+        </div>
     </footer>
+    <!-- Bootstrap and jQuery scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.9/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Leaflet scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <!-- Custom script -->
     <script src="/static/script.js"></script>
 </body>
 </html>

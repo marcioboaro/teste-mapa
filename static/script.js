@@ -72,7 +72,7 @@ function saveGeoJSON(geojson) {
     if (xhr.status === 200) {
       var response = JSON.parse(xhr.responseText);
       if (response.status === 'success') {
-        alert(response.message);
+        document.getElementById('cods_imovel').value = response.message;
       } else if (response.status === 'not_found') {
         alert(response.message);
       } else {
